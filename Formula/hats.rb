@@ -1,8 +1,8 @@
 class Hats < Formula
   desc "Run several Claude accounts side by side and see every running Claude"
   homepage "https://github.com/wearhats/hats"
-  url "https://github.com/wearhats/hats/releases/download/hats-v0.1.0/hats-macos-universal.tar.gz"
-  sha256 "2da5a31cee7b4c1d808e9d59a9060e802d9260d69276e9b540595c9938ac56d5"
+  url "https://github.com/wearhats/hats/releases/download/v0.1.1/hats-macos-universal.tar.gz"
+  sha256 "0fc7a0ae59ec903ff4368f492d0ebd06be34d79d0a1bd48fb29820171162e4d4"
   license "MIT"
   head "https://github.com/wearhats/hats.git", branch: "main"
 
