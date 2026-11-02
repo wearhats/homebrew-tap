@@ -1,0 +1,45 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  formulae:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Audit, install, test and uninstall each formula
+        env:
+          # Runners share IPs, so audit's GitHub API calls hit the anonymous rate limit.
+          HOMEBREW_GITHUB_API_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          formula_files=(Formula/*.rb)
+          if [ "${#formula_files[@]}" -eq 0 ]; then
+            echo "::notice::No formulae to test yet"
+            exit 0
+          fi
+          brew tap wearhats/tap "$PWD"
+          # Only a fully qualified `brew install` trusts a tap implicitly; audit and test refuse to load it otherwise.
+          brew trust wearhats/tap
+          for formula_file in "${formula_files[@]}"; do
+            formula="wearhats/tap/$(basename "$formula_file" .rb)"
+            brew audit --strict --online "$formula"
+            brew install "$formula"
+            brew test "$formula"
+            brew uninstall "$formula"
+          done
